@@ -1,0 +1,10 @@
+externaldata (['features']: string )[h@'https://tie.digitraffic.fi/api/maintenance/v1/tracking/routes/latest?domain=state-roads']with(format=multijson)
+| project parse_json(features)
+| mv-expand kind=array features
+| extend type = parse_json(features)
+| project type["properties"], type["geometry"]
+| project Time = type_properties.['time'], Tasks = type_properties.['tasks'][0], Lat = type_geometry.['coordinates'][0], Long = type_geometry.['coordinates'][1]
+| extend Lat=toreal(Lat),Long=toreal(Long)
+| extend Mapinfo = strcat(Tasks, " ", Time)
+| project Lat,Long,Mapinfo
+| render scatterchart with(kind=map)
