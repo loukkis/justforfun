@@ -5,6 +5,9 @@ externaldata (['features']: string )[h@'https://tie.digitraffic.fi/api/maintenan
 | project type["properties"], type["geometry"]
 | project Time = type_properties.['time'], Tasks = type_properties.['tasks'][0], Lat = type_geometry.['coordinates'][0], Long = type_geometry.['coordinates'][1]
 | extend Lat=toreal(Lat),Long=toreal(Long)
-| extend Mapinfo = strcat(Tasks, " ", Time)
-| project Lat,Long,Mapinfo
+| extend DatetimeTimestamp = todatetime(Time)
+| extend LocalTime = datetime_utc_to_local(DatetimeTimestamp, 'Europe/Helsinki')
+| extend TimeOnly = format_datetime(LocalTime, 'HH:mm:ss')
+| extend MapPointInfo = strcat(Tasks, " ", TimeOnly)
+| project Lat,Long,MapPointInfo
 | render scatterchart with(kind=map)
